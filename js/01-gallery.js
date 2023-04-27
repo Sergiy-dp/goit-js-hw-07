@@ -1,42 +1,53 @@
-import { galleryItems } from './gallery-items.js';
+
+import { galleryItems } from "./gallery-items.js";
 // Change code below this line
+
 const galleryList = document.querySelector(".gallery");
+let instance = "";
 
-// Create and render gallery items
-const createGalleryItem = ({ preview, original, description }) => `
-  <li class="gallery__item">
-    <a class="gallery__link" href="${original}" data-original-img=${original}>
-      <img class="gallery__image" src="${preview}" alt="${description}" />
-    </a>
-  </li>`;
+const galleryMarkup = galleryItems
+  .map((item) => {
+    return `<li class="gallery__item">
+                <a class="gallery__link" href="${item.original}">
+                    <img
+                        class="gallery__image"
+                        data-source="${item.original}"
+                        src="${item.preview}" 
+                        alt="${item.description}"
+                    >
+                </a>
+            </li>`;
+  })
+  .join("");
+galleryList.innerHTML = galleryMarkup;
 
-
-galleryList.innerHTML = galleryItems.map(createGalleryItem).join("");
-
-// Store instances in an array
-const instances = [];
-
-// Show corresponding instance when image is clicked
 galleryList.addEventListener("click", (event) => {
   event.preventDefault();
-  const original = event.target
-    .closest(".gallery__link")
-    .getAttribute("data-original-img");
-  const instance = basicLightbox.create(
-    `<img src="${original}" width="800" height="600">`
-  );
-  instances.push(instance); // Add instance to array
-  instance.show();
-  document.addEventListener("keydown", (event) => onEscPress(event, instance));
+
+  if (event.target.nodeName !== "IMG") {
+    return;
+  }
 });
 
-  // Close instance on Esc key press
-const onEscPress = (event, instance) => {
-   const ESC_KEYCODE = "Escape";
-   if (event.code === ESC_KEYCODE) {
-      instance.close();
-      instances.splice(instances.indexOF(instance), 1); // Remove instance from array
-      document.removeEventListener("keydown", (event) =>
-         onEscPress(event, instance));
-   }
-};
+function onOpenModal(event) {
+  event.preventDefault();
+  if (event.target.nodeName !== "IMG") {
+    return;
+  }
+  window.addEventListener("keydown", onCloseModal);
+
+  instance = basicLightbox.create(`
+   <img src="${event.target.dataset.source}">
+   `);
+  instance.show();
+}
+
+galleryList.addEventListener("click", onOpenModal);
+
+function onCloseModal(event) {
+  window.addEventListener("keydown", onCloseModal);
+  if (event.code === "Escape") {
+    instance.close();
+    window.removeEventListener("keydown", onCloseModal);
+  }
+}
