@@ -16,9 +16,9 @@ const createGalleryItem = ({ preview, original, description }) => `
   // Initialize SimpleLightbox
 
 const lightbox = new SimpleLightbox(".gallery .gallery__link", {
-  captions: true,
+  
   captionsData: "alt",
-  captionPosition: "bottom",
+  
   captionDelay: 250,
 });
 
